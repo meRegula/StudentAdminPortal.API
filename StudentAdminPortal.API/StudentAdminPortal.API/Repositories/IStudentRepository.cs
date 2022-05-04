@@ -9,5 +9,7 @@ namespace StudentAdminPortal.API.Repositories
    public interface IStudentRepository
     {
         Task<List<Student>> GetStudentsAync();
+
+        Task<Student> GetStudentAsync(Guid studentId);
     }
 }
