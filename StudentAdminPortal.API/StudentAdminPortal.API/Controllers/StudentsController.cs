@@ -6,11 +6,12 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudentAdminPortal.API.DataModels;
+using StudentAdminPortal.API.DomainModels;
 using StudentAdminPortal.API.Repositories;
 
 namespace StudentAdminPortal.API.Controllers
 {
-     
+
     [ApiController]
     public class StudentsController : Controller
     {
@@ -24,12 +25,12 @@ namespace StudentAdminPortal.API.Controllers
         }
 
         [HttpGet]
-        [Route("[controller]")] 
+        [Route("[controller]")]
         public async Task<IActionResult> GetAllStudents()
         {
-            var students = await studentRepository.GetStudentsAync();               
+            var students = await studentRepository.GetStudentsAync();
 
-            return Ok(mapper.Map<List<Student>>(students));
+            return Ok(mapper.Map<List<DataModels.Student>>(students));
         }
 
 
@@ -46,7 +47,26 @@ namespace StudentAdminPortal.API.Controllers
                 return NotFound();
             }
 
-            return Ok(mapper.Map<Student>(student));
+            return Ok(mapper.Map<DataModels.Student>(student));
+        }
+
+        [HttpPut]
+        [Route("[controller]/{studentId:guid}")]
+        public async Task<IActionResult> UpdateStudentAsync([FromRoute] Guid studentId, [FromBody] UpdateStudentRequest request)
+        {
+            if (await studentRepository.Exists(studentId))
+            {
+                //Update Details
+                var updatedStudent = await studentRepository.UpdateStudent(studentId, mapper.Map<DataModels.Student>(request));
+
+                if (updatedStudent != null)
+                {
+                    return Ok(mapper.Map<DataModels.Student>(updatedStudent));
+                }
+            }
+
+            return NotFound();
+
         }
 
     }
